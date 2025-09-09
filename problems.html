@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Problems - Tech Help Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html">Tech Help Hub</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="problems.html" aria-current="page">Problems</a>
+      <a href="faq.html">FAQs</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html" class="btn btn-sm">Login</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <div class="list-header">
+    <form class="search" id="searchForm">
+      <input type="search" id="searchInput" placeholder="Search problems..." aria-label="Search problems">
+      <button class="btn" type="submit">Search</button>
+    </form>
+    <div class="filters">
+      <select id="category" class="select" aria-label="Category">
+        <option value="">All Categories</option>
+        <option value="performance">Performance</option>
+        <option value="virus">Virus/Malware</option>
+        <option value="hardware">Hardware</option>
+        <option value="software">Software</option>
+        <option value="network">Network</option>
+        <option value="data">Data Recovery</option>
+      </select>
+      <select id="os" class="select" aria-label="OS">
+        <option value="">All OS</option>
+        <option>Windows</option>
+        <option>macOS</option>
+        <option>Linux</option>
+      </select>
+      <select id="difficulty" class="select" aria-label="Difficulty">
+        <option value="">All Difficulty</option>
+        <option>Easy</option>
+        <option>Medium</option>
+        <option>Hard</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="results" class="grid"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Tech Help Hub</p>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="admin.html">Admin</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const problems=[
+  {id:'slow-pc', title:'Computer running slow', category:'performance', os:['Windows','macOS'], difficulty:'Easy', summary:'Speed up a slow computer with cleanup and startup tweaks.'},
+  {id:'wifi-drop', title:'Wi‑Fi keeps disconnecting', category:'network', os:['Windows','Linux','macOS'], difficulty:'Medium', summary:'Stabilize Wi‑Fi by driver, channel and power settings.'},
+  {id:'virus-removal', title:'Remove malware/virus', category:'virus', os:['Windows'], difficulty:'Medium', summary:'Scan, quarantine, and restore system integrity.'},
+  {id:'hdd-noise', title:'Hard drive making noise', category:'hardware', os:['Windows','Linux','macOS'], difficulty:'Hard', summary:'Diagnose failing disks and back up data safely.'}
+];
+
+function render(list){
+  const wrap=document.getElementById('results');
+  wrap.innerHTML=list.map(p=>`<a class="card" href="problem.html?id=${p.id}"><h3>${p.title}</h3><p>${p.summary}</p><div class="meta"><span class="badge">${p.category}</span><span class="badge">${p.difficulty}</span></div></a>`).join('');
+}
+
+function applyFilters(){
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  const category=document.getElementById('category').value;
+  const os=document.getElementById('os').value;
+  const difficulty=document.getElementById('difficulty').value;
+  const filtered=problems.filter(p=>{
+    const qok=!q||p.title.toLowerCase().includes(q)||p.summary.toLowerCase().includes(q);
+    const cok=!category||p.category===category;
+    const ook=!os||p.os.includes(os);
+    const dok=!difficulty||p.difficulty===difficulty;
+    return qok&&cok&&ook&&dok;
+  });
+  render(filtered);
+}
+
+document.getElementById('searchForm').addEventListener('submit',e=>{e.preventDefault();applyFilters();});
+['category','os','difficulty'].forEach(id=>document.getElementById(id).addEventListener('change',applyFilters));
+render(problems);
+</script>
+<script src="assets/js/app.js" defer></script>
+</body>
+</html> 
