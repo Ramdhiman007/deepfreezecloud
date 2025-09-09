@@ -24,6 +24,12 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
     });
   }
+
+  // Favicon injection
+  ensureFavicon();
+
+  // Scroll reveal
+  setupReveal();
 });
 
 // Simple localStorage helpers
@@ -57,7 +63,7 @@ const captcha={
     const answer=a+b;
     const id=`cap-${Math.random().toString(36).slice(2,8)}`;
     const mount=document.getElementById(targetId);
-    mount.innerHTML=`<div class="row"><div class="badge">What is ${a} + ${b}?</div><input id="${id}" placeholder="Answer"></div>`;
+    mount.innerHTML=`<span class="chip" aria-hidden="true">🔐 What is ${a} + ${b}?</span><input id="${id}" placeholder="Answer" aria-label="Captcha answer">`;
     return {id, answer};
   },
   validate(ctx){
@@ -67,7 +73,7 @@ const captcha={
     return ok;
   },
   refresh(ctx){
-    const parent=document.getElementById(ctx.id).parentElement.parentElement.id;
+    const parent=document.getElementById(ctx.id).parentElement.id;
     return this.create(parent);
   }
 };
@@ -97,4 +103,30 @@ function authSyncUI(){
   const u=auth.user();
   const btnLogout=document.getElementById('btnLogout');
   if(btnLogout){btnLogout.style.display=u?'inline-flex':'none';}
+}
+
+function ensureFavicon(){
+  if(document.querySelector('link[rel="icon"]')) return;
+  const link=document.createElement('link');
+  link.rel='icon';
+  link.href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><defs><linearGradient id=%22g%22 x1=%220%22 x2=%221%22><stop stop-color=%22%235b8cff%22/><stop offset=%221%22 stop-color=%22%237f56d9%22/></linearGradient></defs><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22white%22/><path d=%22M12 32c10-12 30-12 40 0-10 12-30 12-40 0z%22 fill=%22url(%23g)%22/></svg>';
+  document.head.appendChild(link);
+}
+
+function setupReveal(){
+  const observer=new IntersectionObserver((entries)=>{
+    for(const e of entries){
+      if(e.isIntersecting){
+        e.target.style.transition='transform .6s cubic-bezier(.2,.8,.2,1), opacity .6s';
+        e.target.style.transform='translateY(0)';
+        e.target.style.opacity='1';
+        observer.unobserve(e.target);
+      }
+    }
+  },{threshold:.08});
+  document.querySelectorAll('.card, .cta-box, .grid > *, .steps .step').forEach(el=>{
+    el.style.transform='translateY(10px)';
+    el.style.opacity='.001';
+    observer.observe(el);
+  });
 } 
